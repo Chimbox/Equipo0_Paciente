@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "425381074543",
+    "project_id": "sistemasalud-e2d34",
+    "storage_bucket": "sistemasalud-e2d34.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425381074543:android:5d0fcdad8c8768a13c1f9a",
+        "android_client_info": {
+          "package_name": "felix.alfonso.equipo0_paciente"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "425381074543-4ruum2fq89hpmt1rluus06rh7mftk5bc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA81iNsk8p0lonJa4OEyVGAbz0_cyfAyGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "425381074543-4ruum2fq89hpmt1rluus06rh7mftk5bc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
