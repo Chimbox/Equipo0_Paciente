@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Equipo0_Paciente</string>
+    <string name="aceptar">Aceptar</string>
+    <string name="rechazar">Rechazar</string>
+    <string name="solicitudes">Solicitudes</string>
+    <string name="solicitudes_amplio">Solicitudes de acceso a tu expediente clínico</string>
 </resources>

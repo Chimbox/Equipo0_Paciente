@@ -1,48 +1,45 @@
 package felix.alfonso.equipo0_paciente
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
-import okhttp3.*
-import java.io.IOException
+import androidx.appcompat.app.AppCompatActivity
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import equipo0_dominio.Paciente
+import equipo0_dominio.Usuario
+import felix.alfonso.equipo0_paciente.dominio.Solicitud
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.collections.ArrayList
+
 
 class MainActivity : AppCompatActivity() {
 
-    private val servicio = NotificationService()
-    private val apiPaciente = OkHttpClient()
+    companion object{
+        lateinit var usuarioActivo: Paciente
+        var lstSolicitudes = ArrayList<Solicitud>()
+        var servicio = NotificationService()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //servicio.obtenerToken()
-
-        run("http://192.168.0.12:8084/Equipo0_GatewayPaciente/res/Paciente")
-    }
-
-    fun run(url: String) {
-        val request = Request.Builder()
-                .url(url)
-                .get()
-                .build()
-
-        var respuesta:Response?=null
-        var mensaje:String?=null
-
-        apiPaciente.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                mensaje=e.message
-            }
-            override fun onResponse(call: Call, response: Response) {
-                respuesta=response
-            }
-        })
-
-        if(respuesta!=null) {
-            Toast.makeText(applicationContext, respuesta!!.body()?.string(), Toast.LENGTH_LONG).show()
-        }else{
-            Toast.makeText(applicationContext, mensaje, Toast.LENGTH_SHORT).show()
+        if (usuarioActivo!=null){
+            tvHola.text="Hola ${usuarioActivo.nombre} ${usuarioActivo.primerApellido} ${usuarioActivo.segundoApellido}"
         }
+
+        servicio.obtenerToken()
+
+        btnSolicitudes.setOnClickListener {
+            var intent= Intent(this, SolicitudesActivity::class.java)
+            startActivity(intent)
+        }
+
 
     }
 }
