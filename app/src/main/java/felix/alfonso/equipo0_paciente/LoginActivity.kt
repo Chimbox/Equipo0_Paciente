@@ -1,15 +1,13 @@
 package felix.alfonso.equipo0_paciente
 
-import android.R.attr.tag
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.http.X509TrustManagerExtensions
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.JsonRequest
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
@@ -18,6 +16,9 @@ import felix.alfonso.equipo0_paciente.http.ChimboxJsonObjectRequest
 import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.*
 
 
 class LoginActivity : AppCompatActivity() {
@@ -28,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-
+        handleSSLHandshake()
         btnLogin.setOnClickListener {
 
             var requestQueue = Volley.newRequestQueue(getApplicationContext())
@@ -63,17 +64,24 @@ class LoginActivity : AppCompatActivity() {
                     } catch (e: JSONException) {
                         e.printStackTrace();
                     }
-                    var jsonObjectRequest = ChimboxJsonObjectRequest(Request.Method.POST, URL_DATOS, obj, {
-                        MainActivity.usuarioActivo =
-                            gson.fromJson(it.toString(), Paciente::class.java)
-                        MainActivity.usuarioActivo.username=etUsername.text.toString()
-                        Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG)
-                            .show()
-                        var intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                    }, {
+                    var jsonObjectRequest = ChimboxJsonObjectRequest(
+                        Request.Method.POST,
+                        URL_DATOS,
+                        obj,
+                        {
+                            MainActivity.usuarioActivo =
+                                gson.fromJson(it.toString(), Paciente::class.java)
+                            MainActivity.usuarioActivo.username = etUsername.text.toString()
+                            Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG)
+                                .show()
+                            var intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                        },
+                        {
 
-                    }, token)
+                        },
+                        token
+                    )
 
 
                     requestQueue.add(jsonObjectRequest)
@@ -128,5 +136,29 @@ class LoginActivity : AppCompatActivity() {
         } catch (e: JSONException) {
             e.printStackTrace()
         }*/
+    }
+
+    @SuppressLint("TrulyRandom")
+    fun handleSSLHandshake() {
+        try {
+            val trustAllCerts: Array<TrustManager> =
+                arrayOf<TrustManager>(object:X509TrustManager {
+                    val acceptedIssuers: Array<Any?>?
+                        get() = arrayOfNulls(0)
+
+                    override fun checkClientTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun checkServerTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                })
+            val sc: SSLContext = SSLContext.getInstance("SSL")
+            sc.init(null, trustAllCerts, SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier(object : HostnameVerifier {
+                override fun verify(arg0: String?, arg1: SSLSession?): Boolean {
+                    return true
+                }
+            })
+        } catch (ignored: Exception) {
+        }
     }
 }
