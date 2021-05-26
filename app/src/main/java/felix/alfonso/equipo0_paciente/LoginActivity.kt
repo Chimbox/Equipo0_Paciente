@@ -1,26 +1,29 @@
 package felix.alfonso.equipo0_paciente
 
+import android.R.attr.tag
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.*
-import com.android.volley.toolbox.HttpHeaderParser
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.JsonRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
 import equipo0_dominio.Paciente
+import felix.alfonso.equipo0_paciente.http.ChimboxJsonObjectRequest
 import kotlinx.android.synthetic.main.activity_login.*
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.UnsupportedEncodingException
 
 
 class LoginActivity : AppCompatActivity() {
 
-    val URL = "http://192.168.0.12:8084/Equipo0_GatewayPaciente/res/paciente/login"
+    val URL = "https://192.168.0.16:8443/Equipo0_GatewayPaciente/res/paciente/login"
+    val URL_DATOS = "https://192.168.0.16:8443/Equipo0_GatewayPaciente/res/paciente/obtenerdatos"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,16 +43,41 @@ class LoginActivity : AppCompatActivity() {
             // Enter the correct url for your api service site
             var jsonObjectRequest = JsonObjectRequest(Request.Method.POST, URL, obj,
                 {
-                    var gson=GsonBuilder().create()
-                    if(!it.has("estado")) {
-                            MainActivity.usuarioActivo =
-                                gson.fromJson(it.toString(), Paciente::class.java)
-                            Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG)
-                                .show()
-                            var intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
+                    var gson = GsonBuilder().create()
+
+                    var token =
+                        gson.fromJson(it.toString(), JsonElement::class.java).asJsonObject.get(
+                            "token"
+                        ).asString
+
+                    MainActivity.token = token
+
+                    var requestQueue = Volley.newRequestQueue(getApplicationContext())
+
+
+                    var obj = JSONObject()
+
+                    try {
+                        //input your API parameters
+                        obj.put("username", etUsername.text.toString())
+                    } catch (e: JSONException) {
+                        e.printStackTrace();
                     }
+                    var jsonObjectRequest = ChimboxJsonObjectRequest(Request.Method.POST, URL_DATOS, obj, {
+                        MainActivity.usuarioActivo =
+                            gson.fromJson(it.toString(), Paciente::class.java)
+                        MainActivity.usuarioActivo.username=etUsername.text.toString()
+                        Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG)
+                            .show()
+                        var intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    }, {
+
+                    }, token)
+
+
+                    requestQueue.add(jsonObjectRequest)
+
                 }, {
                     Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG).show()
                 });

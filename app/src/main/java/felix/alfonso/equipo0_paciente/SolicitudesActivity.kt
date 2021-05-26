@@ -1,6 +1,7 @@
 package felix.alfonso.equipo0_paciente
 
 import android.os.Bundle
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.AuthFailureError
 import com.android.volley.NetworkResponse
@@ -23,18 +24,19 @@ class SolicitudesActivity : AppCompatActivity() {
 
 
     var lstSolicitudes=MainActivity.lstSolicitudes
+    companion object{
+        lateinit var adapter:SolicitudAdapter
+        var iniciado:Boolean=false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_solicitudes)
 
-        var adapter=SolicitudAdapter(lstSolicitudes!!, this)
+        adapter=SolicitudAdapter(lstSolicitudes!!, this)
+        iniciado=true
 
-        lvSolicitudes.adapter=adapter
+        lvSolicitudes.adapter= adapter
 
-    }
-
-    override fun onBackPressed() {
-        finish()
     }
 }

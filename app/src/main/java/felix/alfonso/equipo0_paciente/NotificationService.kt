@@ -22,16 +22,19 @@ import felix.alfonso.equipo0_paciente.dominio.Solicitud
 
 class NotificationService : FirebaseMessagingService() {
 
-    fun obtenerToken() {
+    fun obtenerToken() : String?{
+        var token:String?=""
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 return@OnCompleteListener
             }
 
-            val token = task.result
+            task.result.also { token = it }
 
             Log.d("TOKENFIREBASE", token)
         })
+
+        return token
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
@@ -43,6 +46,9 @@ class NotificationService : FirebaseMessagingService() {
             var solicitud=gson.fromJson(gson.toJson(data), Solicitud::class.java)
 
             MainActivity.lstSolicitudes.add(solicitud)
+            if(SolicitudesActivity.iniciado){
+                SolicitudesActivity.adapter.notifyDataSetChanged()
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 showNotification(solicitud.body)
@@ -52,7 +58,7 @@ class NotificationService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun showNotification(body:String) {
-        val intent = Intent(applicationContext, MainActivity::class.java)
+        val intent = Intent(applicationContext, SolicitudesActivity::class.java)
         val CHANNEL_ID = "MYCHANNEL"
         val notificationChannel =
             NotificationChannel(CHANNEL_ID, "name", NotificationManager.IMPORTANCE_HIGH)
@@ -66,10 +72,12 @@ class NotificationService : FirebaseMessagingService() {
             .setSmallIcon(R.drawable.sym_action_chat)
             .build()
 
+
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(notificationChannel)
         notificationManager.notify(1, notification)
+
     }
 
 }
