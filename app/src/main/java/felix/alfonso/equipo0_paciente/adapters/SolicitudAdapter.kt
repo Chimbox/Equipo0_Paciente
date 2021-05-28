@@ -64,6 +64,8 @@ class SolicitudAdapter : BaseAdapter {
             Toast.makeText(context, "Aprobada", Toast.LENGTH_SHORT).show()
             solicitud.aprobada = true
             actualizarSolicitud(solicitud)
+            lstSolicitudes.removeAt(p0)
+            notifyDataSetChanged()
         }
         view.btnRechazar.setOnClickListener {
             Toast.makeText(context, "Rechazada", Toast.LENGTH_SHORT).show()

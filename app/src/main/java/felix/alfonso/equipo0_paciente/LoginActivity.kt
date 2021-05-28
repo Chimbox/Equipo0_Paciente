@@ -72,8 +72,6 @@ class LoginActivity : AppCompatActivity() {
                             MainActivity.usuarioActivo =
                                 gson.fromJson(it.toString(), Paciente::class.java)
                             MainActivity.usuarioActivo.username = etUsername.text.toString()
-                            Toast.makeText(applicationContext, it.toString(), Toast.LENGTH_LONG)
-                                .show()
                             var intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                         },
